@@ -20,7 +20,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.utilities.NetworkUtils;
+import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
+import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -41,24 +44,32 @@ public class MainActivity extends AppCompatActivity {
         mWeatherTextView = (TextView) findViewById(R.id.tv_weather_data);
 
 
-        makeWeatherTask("New York");
+        makeWeatherTask();
     }
 
-    protected void makeWeatherTask(String userLocation) {
-        URL weatherQueryUrl = NetworkUtils.buildUrl(userLocation);
-        new WeatherQueryTask().execute(weatherQueryUrl);
+    protected void makeWeatherTask() {
+        String userLocation = SunshinePreferences.getPreferredWeatherLocation(this);
+
+        new WeatherQueryTask().execute(userLocation);
     }
 
 
-    public class WeatherQueryTask extends AsyncTask<URL, Void, String> {
+    public class WeatherQueryTask extends AsyncTask<String, Void, String[]> {
         @Override
-        protected String doInBackground(URL... urls) {
-            URL weatherUrl = urls[0];
+        protected String[] doInBackground(String... locations) {
+            if (locations.length == 0) {
+                return null;
+            }
 
-            String weatherResult = null;
+            URL weatherUrl = NetworkUtils.buildUrl(locations[0]);
+
+            String[] weatherResult = null;
             try {
-                weatherResult = NetworkUtils.getResponseFromHttpUrl(weatherUrl);
-            } catch (IOException e) {
+                String weatherResponse = NetworkUtils.getResponseFromHttpUrl(weatherUrl);
+
+                weatherResult = OpenWeatherJsonUtils.getSimpleWeatherStringsFromJson(MainActivity.this, weatherResponse);
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -66,8 +77,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String weatherResult) {
-            mWeatherTextView.setText(weatherResult);
+        protected void onPostExecute(String[] weatherResult) {
+            for (String weather : weatherResult) {
+                mWeatherTextView.append(weather + "\n\n\n");
+            }
         }
     }
 }
