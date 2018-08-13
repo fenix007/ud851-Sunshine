@@ -223,6 +223,8 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
         if (id == R.id.action_open_map) {
             openMap(SunshinePreferences.getPreferredWeatherLocation(this));
+
+            return true;
         }
 
         // TODO (2) Launch the map when the map menu item is clicked
@@ -241,6 +243,10 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
         intent.setData(uri);
 
-        startActivity(intent);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.d(TAG, "Could not find app for map location");
+        }
     }
 }
