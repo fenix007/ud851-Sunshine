@@ -109,28 +109,8 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         /* Once all of our views are setup, we can load the weather data. */
-        loadWeatherData();
-    }
-
-    /**
-     * This method will get the user's preferred location for weather, and then tell some
-     * background method to get the weather data in the background.
-     */
-    private void loadWeatherData() {
-        showWeatherDataView();
-
-        String location = SunshinePreferences.getPreferredWeatherLocation(this);
-
-        Bundle locationBundle = new Bundle();
-        locationBundle.putString(WEATHER_LOCATION, location);
-
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> githubSearchLoader = loaderManager.getLoader(WEATHER_LOADER);
-        if (githubSearchLoader == null) {
-            loaderManager.initLoader(WEATHER_LOADER, locationBundle, this);
-        } else {
-            loaderManager.restartLoader(WEATHER_LOADER, locationBundle, this);
-        }
+        loaderManager.initLoader(WEATHER_LOADER, null, this);
     }
 
     @Override
@@ -141,22 +121,17 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
             @Override
             protected void onStartLoading() {
-                if (bundle == null) {
-                    return;
-                }
-
-                mLoadingIndicator.setVisibility(View.VISIBLE);
-
                 if (mWeatherData != null) {
                     deliverResult(mWeatherData);
                 } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
                     forceLoad();
                 }
             }
 
             @Override
             public String[] loadInBackground() {
-                String location = bundle.getString(WEATHER_LOCATION);
+                String location = SunshinePreferences.getPreferredWeatherLocation(MainActivity.this);
 
                 if (location == null || TextUtils.isEmpty(location)) {
                     return null;
@@ -200,6 +175,10 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
     @Override
     public void onLoaderReset(Loader<String[]> loader) {
+    }
+
+    private void invalidateData() {
+        mForecastAdapter.setWeatherData(null);
     }
 
     /**
@@ -285,8 +264,8 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
-            mForecastAdapter.setWeatherData(null);
-            loadWeatherData();
+            invalidateData();
+            getSupportLoaderManager().restartLoader(WEATHER_LOADER, null, this);
             return true;
         }
 
