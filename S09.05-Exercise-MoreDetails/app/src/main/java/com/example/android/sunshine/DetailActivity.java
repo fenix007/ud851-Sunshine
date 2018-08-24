@@ -54,11 +54,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public static final int INDEX_WEATHER_DATE = 0;
     public static final int INDEX_WEATHER_MAX_TEMP = 1;
     public static final int INDEX_WEATHER_MIN_TEMP = 2;
-    public static final int INDEX_WEATHER_CONDITION_ID = 3;
-    public static final int INDEX_WEATHER_HUMIDITY_ID = 4;
-    public static final int INDEX_WEATHER_PRESSURE_ID = 5;
-    public static final int INDEX_WEATHER_WIND_SPEED_ID = 6;
-    public static final int INDEX_WEATHER_DEGREES_ID = 7;
+    public static final int INDEX_WEATHER_HUMIDITY = 3;
+    public static final int INDEX_WEATHER_PRESSURE = 4;
+    public static final int INDEX_WEATHER_WIND_SPEED = 5;
+    public static final int INDEX_WEATHER_DEGREES = 6;
+    public static final int INDEX_WEATHER_CONDITION_ID = 7;
+
 //  TODO (19) Create constant int values representing each column name's position above
     private static final int ID_DETAIL_LOADER = 21;
 
@@ -199,17 +200,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             String description = SunshineWeatherUtils.getStringForWeatherCondition(this, weatherId);
             double highInCelsius = data.getDouble(INDEX_WEATHER_MAX_TEMP);
             double lowInCelsius = data.getDouble(INDEX_WEATHER_MIN_TEMP);
-            String humidity = data.getString(INDEX_WEATHER_HUMIDITY_ID);
-            String pressure = data.getString(INDEX_WEATHER_PRESSURE_ID);
-            float windSpeed = data.getFloat(INDEX_WEATHER_WIND_SPEED_ID);
-            float degrees = data.getFloat(INDEX_WEATHER_DEGREES_ID);
+            float humidity = data.getFloat(INDEX_WEATHER_HUMIDITY);
+            String humidityString = getString(R.string.format_humidity, humidity);
+            String pressure = data.getString(INDEX_WEATHER_PRESSURE);
+            float windSpeed = data.getFloat(INDEX_WEATHER_WIND_SPEED);
+            float degrees = data.getFloat(INDEX_WEATHER_DEGREES);
             String wind = SunshineWeatherUtils.getFormattedWind(this, windSpeed, degrees);
 
             mDayDate.setText(dayDate);
             mDayWeatherDescr.setText(description);
             mDayHighTemp.setText(SunshineWeatherUtils.formatTemperature(this, highInCelsius));
             mLowHighTemp.setText(SunshineWeatherUtils.formatTemperature(this, lowInCelsius));
-            mDayHumidity.setText(humidity);
+            mDayHumidity.setText(humidityString);
             mDayPressure.setText(pressure);
             mDayWind.setText(wind);
 
