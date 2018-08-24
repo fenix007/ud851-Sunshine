@@ -58,7 +58,7 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
      * @param clickHandler The on-click handler for this adapter. This single handler is called
      *                     when an item is clicked.
      */
-    public ForecastAdapter(ForecastAdapterOnClickHandler clickHandler, Context context) {
+    public ForecastAdapter(ForecastAdapterOnClickHandler clickHandler, @NonNull Context context) {
         mClickHandler = clickHandler;
         mContext = context;
     }
